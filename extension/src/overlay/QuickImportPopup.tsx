@@ -399,7 +399,7 @@ export const QuickImportPopup: React.FC<QuickImportPopupProps> = ({
                 setShowDeckDropdown(true);
                 setDeckSelectedIndex(-1);
               }}
-              onFocus={(event) => {
+              onFocus={(event: React.FocusEvent<HTMLInputElement>) => {
                 event.target.select();
                 if (decks.length > 0) {
                   setShowDeckDropdown(true);
@@ -565,7 +565,7 @@ export const QuickImportPopup: React.FC<QuickImportPopupProps> = ({
                 setShowModelDropdown(true);
                 setModelSelectedIndex(-1);
               }}
-              onFocus={(event) => {
+              onFocus={(event: React.FocusEvent<HTMLInputElement>) => {
                 event.target.select();
                 if (models.length > 0) {
                   setShowModelDropdown(true);
