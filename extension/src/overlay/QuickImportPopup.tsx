@@ -214,8 +214,8 @@ export const QuickImportPopup: React.FC<QuickImportPopupProps> = ({
   });
 
   // Get recent items
-  const recentDecks = useMemo(() => getRecentDecks(), []);
-  const recentModels = useMemo(() => getRecentModels(), []);
+  const [recentDecks, setRecentDecks] = useState<string[]>(() => getRecentDecks());
+  const [recentModels, setRecentModels] = useState<string[]>(() => getRecentModels());
 
   // Filter decks with smart search
   const filteredDecks = useMemo(() => {
@@ -274,6 +274,7 @@ export const QuickImportPopup: React.FC<QuickImportPopupProps> = ({
     if (deck) {
       applyDeck(deck);
       saveRecentDeck(deck);
+      setRecentDecks(getRecentDecks());
     }
   }, [deck, applyDeck]);
 
@@ -281,6 +282,7 @@ export const QuickImportPopup: React.FC<QuickImportPopupProps> = ({
     if (model) {
       applyModel(model);
       saveRecentModel(model);
+      setRecentModels(getRecentModels());
     }
   }, [model, applyModel]);
 
@@ -397,7 +399,8 @@ export const QuickImportPopup: React.FC<QuickImportPopupProps> = ({
                 setShowDeckDropdown(true);
                 setDeckSelectedIndex(-1);
               }}
-              onFocus={() => {
+              onFocus={(event) => {
+                event.target.select();
                 if (decks.length > 0) {
                   setShowDeckDropdown(true);
                   setDeckSelectedIndex(-1);
@@ -562,7 +565,8 @@ export const QuickImportPopup: React.FC<QuickImportPopupProps> = ({
                 setShowModelDropdown(true);
                 setModelSelectedIndex(-1);
               }}
-              onFocus={() => {
+              onFocus={(event) => {
+                event.target.select();
                 if (models.length > 0) {
                   setShowModelDropdown(true);
                   setModelSelectedIndex(-1);
