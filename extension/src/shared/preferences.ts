@@ -26,7 +26,9 @@ const DEFAULT_PREFERENCES: UserPreferences = {
   shortcut: 'Alt+A',
   clipboardEnabled: false,
   siteAllowlist: [],
-  siteBlocklist: []
+  siteBlocklist: [],
+  defaultImportMode: 'quick',
+  quickImportPosition: 'bottom-right'
 };
 
 export const getDefaultPreferences = (): UserPreferences => ({ ...DEFAULT_PREFERENCES });

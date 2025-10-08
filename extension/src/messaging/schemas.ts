@@ -30,7 +30,9 @@ export const UserPreferencesSchema = z.object({
   shortcut: z.string().min(1),
   clipboardEnabled: z.boolean(),
   siteAllowlist: z.array(z.string()),
-  siteBlocklist: z.array(z.string())
+  siteBlocklist: z.array(z.string()),
+  defaultImportMode: z.enum(['quick', 'full']).optional().default('quick'),
+  quickImportPosition: z.enum(['bottom-right', 'bottom-left', 'top-right', 'top-left']).optional().default('bottom-right')
 });
 
 export const MediaAssetSchema = z.object({

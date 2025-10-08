@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useCardStore } from './state/useCardStore';
 import { usePreferences } from './state/usePreferences';
 import { submitSelectedCards } from './actions/submitCards';
+import { useDraggable } from './hooks/useDraggable';
+import { showToast } from './utils/toastManager';
 import { 
   getRecentDecks, 
   getRecentModels, 
@@ -18,10 +20,7 @@ interface QuickImportPopupProps {
   onClose: () => void;
 }
 
-const popupStyle: React.CSSProperties = {
-  position: 'fixed',
-  bottom: '20px',
-  right: '20px',
+const basePopupStyle: React.CSSProperties = {
   width: '350px',
   maxHeight: '500px',
   background: 'rgba(16, 24, 32, 0.98)',
@@ -44,7 +43,8 @@ const headerStyle: React.CSSProperties = {
   display: 'flex',
   justifyContent: 'space-between',
   alignItems: 'center',
-  background: 'rgba(15, 23, 42, 0.5)'
+  background: 'rgba(15, 23, 42, 0.5)',
+  cursor: 'grab'
 };
 
 const bodyStyle: React.CSSProperties = {
@@ -120,6 +120,15 @@ export const QuickImportPopup: React.FC<QuickImportPopupProps> = ({
   const [statusMessage, setStatusMessage] = useState('');
   const [isImporting, setIsImporting] = useState(false);
 
+  // Draggable functionality
+  const draggable = useDraggable({
+    initialPosition: { 
+      x: window.innerWidth - 370, // 350px width + 20px margin
+      y: window.innerHeight - 520  // 500px max height + 20px margin
+    },
+    storageKey: 'quick-import'
+  });
+
   // Apply to cards when changed
   useEffect(() => {
     if (deck) {
@@ -151,15 +160,32 @@ export const QuickImportPopup: React.FC<QuickImportPopupProps> = ({
       const result = await submitSelectedCards();
       if (result.ok) {
         setStatusMessage('✓ Success!');
+        showToast({
+          message: `Successfully imported ${cardCount} card${cardCount !== 1 ? 's' : ''}!`,
+          type: 'success',
+          duration: 2000
+        });
         setTimeout(() => {
           onClose();
-        }, 1000);
+        }, 800);
       } else {
-        setStatusMessage(`Error: ${result.reason || 'Unknown error'}`);
+        const errorMsg = result.reason || 'Unknown error';
+        setStatusMessage(`Error: ${errorMsg}`);
+        showToast({
+          message: `Import failed: ${errorMsg}`,
+          type: 'error',
+          duration: 4000
+        });
         setIsImporting(false);
       }
     } catch (error) {
-      setStatusMessage(`Error: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      const errorMsg = error instanceof Error ? error.message : 'Unknown error';
+      setStatusMessage(`Error: ${errorMsg}`);
+      showToast({
+        message: `Import failed: ${errorMsg}`,
+        type: 'error',
+        duration: 4000
+      });
       setIsImporting(false);
     }
   };
@@ -177,9 +203,21 @@ export const QuickImportPopup: React.FC<QuickImportPopupProps> = ({
   }, [deck, model, tags]);
 
   return (
-    <div style={popupStyle}>
-      {/* Header */}
-      <div style={headerStyle}>
+    <div 
+      ref={draggable.ref}
+      style={{
+        ...basePopupStyle,
+        ...draggable.style
+      }}
+    >
+      {/* Header - Draggable */}
+      <div 
+        style={{
+          ...headerStyle,
+          cursor: draggable.isDragging ? 'grabbing' : 'grab'
+        }}
+        data-draggable-handle
+      >
         <div>
           <strong style={{ fontSize: '1rem' }}>✓ Anki Quick Import</strong>
           <div style={{ fontSize: '0.75rem', color: '#94a3b8', marginTop: '0.2rem' }}>

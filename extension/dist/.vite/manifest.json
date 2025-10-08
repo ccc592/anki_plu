@@ -13,41 +13,41 @@
     "file": "assets/jsx-runtime-B0b5C804.js",
     "name": "jsx-runtime"
   },
-  "_preferences-OC0DdBqU.js": {
-    "file": "assets/preferences-OC0DdBqU.js",
+  "_preferences-DIYMumkR.js": {
+    "file": "assets/preferences-DIYMumkR.js",
     "name": "preferences"
   },
   "index.ts-loader.js": {
-    "file": "assets/index.ts-loader-CY69ezov.js",
+    "file": "assets/index.ts-loader-gY4ZrbU3.js",
     "src": "index.ts-loader.js"
   },
   "options.html": {
-    "file": "assets/options.html-DgTF6EeW.js",
+    "file": "assets/options.html-D7l23eoW.js",
     "name": "options.html",
     "src": "options.html",
     "isEntry": true,
     "imports": [
       "_jsx-runtime-B0b5C804.js",
-      "_preferences-OC0DdBqU.js"
+      "_preferences-DIYMumkR.js"
     ]
   },
   "src/background/index.ts": {
-    "file": "assets/index.ts-CV0oHyn4.js",
+    "file": "assets/index.ts-BpA8BSEm.js",
     "name": "index.ts",
     "src": "src/background/index.ts",
     "isEntry": true,
     "imports": [
-      "_preferences-OC0DdBqU.js",
+      "_preferences-DIYMumkR.js",
       "_htmlCleaner-CloQSUk8.js"
     ]
   },
   "src/content/index.ts": {
-    "file": "assets/index.ts-BrmcbTQE.js",
+    "file": "assets/index.ts-xVXGrspb.js",
     "name": "index.ts",
     "src": "src/content/index.ts",
     "isEntry": true,
     "imports": [
-      "_preferences-OC0DdBqU.js",
+      "_preferences-DIYMumkR.js",
       "_htmlCleaner-CloQSUk8.js",
       "_jsx-runtime-B0b5C804.js"
     ],
@@ -56,14 +56,14 @@
     ]
   },
   "src/overlay/AppContainer.tsx": {
-    "file": "assets/AppContainer-BqUgf2bg.js",
+    "file": "assets/AppContainer-C-uN2Pcy.js",
     "name": "AppContainer",
     "src": "src/overlay/AppContainer.tsx",
     "isDynamicEntry": true,
     "imports": [
       "_jsx-runtime-B0b5C804.js",
       "src/content/index.ts",
-      "_preferences-OC0DdBqU.js",
+      "_preferences-DIYMumkR.js",
       "_htmlCleaner-CloQSUk8.js"
     ]
   }
