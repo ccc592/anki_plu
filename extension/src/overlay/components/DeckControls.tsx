@@ -116,10 +116,15 @@ export const DeckControls: React.FC = () => {
     setTags(defaults.tags);
   }, [defaults.deck, defaults.model, defaults.tags]);
 
+  // Get recent choices
+  const [recentDecks, setRecentDecks] = useState<string[]>(() => getRecentDecks());
+  const [recentModels, setRecentModels] = useState<string[]>(() => getRecentModels());
+
   useEffect(() => {
     if (deck) {
       applyDeck(deck);
       saveRecentDeck(deck); // Save to recent
+      setRecentDecks(getRecentDecks());
     }
   }, [deck, applyDeck]);
 
@@ -127,6 +132,7 @@ export const DeckControls: React.FC = () => {
     if (model) {
       applyModel(model);
       saveRecentModel(model); // Save to recent
+      setRecentModels(getRecentModels());
     }
   }, [model, applyModel]);
 
@@ -145,10 +151,6 @@ export const DeckControls: React.FC = () => {
   const [showCustomModel, setShowCustomModel] = useState(false);
   const [deckSearchQuery, setDeckSearchQuery] = useState('');
   const [modelSearchQuery, setModelSearchQuery] = useState('');
-  
-  // Get recent choices
-  const recentDecks = useMemo(() => getRecentDecks(), []);
-  const recentModels = useMemo(() => getRecentModels(), []);
 
   // Sort decks: selected on top, then recent, then alphabetically
   const sortedDecks = useMemo(() => {
