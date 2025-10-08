@@ -48,6 +48,25 @@
 
 ## 🚀 快速开始
 
+### 0. ⚠️ Anki配置（重要！）
+
+在使用扩展前，需要配置AnkiConnect：
+
+1. **安装AnkiConnect插件**
+   - Anki → 工具 → 插件 → 获取插件...
+   - 代码：`2055492159`
+
+2. **配置CORS白名单**
+   - Anki → 工具 → 插件 → AnkiConnect → 配置
+   - 添加扩展ID到白名单（详见 [快速修复指南](QUICK_FIX.md)）
+
+3. **验证连接**
+   ```bash
+   ./diagnose-anki-connection.sh
+   ```
+
+> 💡 **遇到连接问题？** 查看 [QUICK_FIX.md](QUICK_FIX.md) 快速解决
+
 ### 1. 安装依赖
 
 ```bash
@@ -70,6 +89,8 @@ pnpm dev
 2. 开启"开发者模式"
 3. 点击"加载已解压的扩展程序"
 4. 选择 `extension/dist` 目录
+5. **复制扩展ID**（32位字符）
+6. 将扩展ID添加到AnkiConnect白名单（见步骤0）
 
 ### 4. 使用方法
 
@@ -151,12 +172,24 @@ pnpm -r test      # 运行所有测试
 
 | 文档 | 说明 |
 |------|------|
+| [⚡ 快速修复](./QUICK_FIX.md) | **Anki连接问题快速解决（必读！）** ⭐⭐⭐ |
+| [🔧 修复指南](./ANKI_FIX_GUIDE.md) | Anki连接问题完整解决指南 |
+| [🔍 诊断报告](./DIAGNOSIS_REPORT.md) | MCP诊断过程和技术分析 |
 | [快速导入指南](./QUICK_IMPORT_GUIDE.md) | 快速导入模式完整使用指南（v0.3.0新增）⭐ |
 | [UX改进说明](./UX_IMPROVEMENTS.md) | 快捷键/批量操作/智能记忆功能详解 |
 | [项目状态](./PROJECT_STATUS.md) | 完整检查报告、构建状态、回滚指南 |
 | [产品文档](./Anki助手chrome插件产品文档.md) | 产品规格和设计要求 |
 | [开发指南](./AGENTS.md) | 技术栈、编码规范 |
 | [构建说明](./BUILD.md) | 详细构建步骤 |
+
+### 🆘 故障排除
+
+遇到问题？按优先级查看：
+
+1. **无法连接Anki** → [QUICK_FIX.md](./QUICK_FIX.md)（3分钟解决）
+2. **详细诊断** → 运行 `./diagnose-anki-connection.sh`
+3. **完整指南** → [ANKI_FIX_GUIDE.md](./ANKI_FIX_GUIDE.md)
+4. **技术细节** → [DIAGNOSIS_REPORT.md](./DIAGNOSIS_REPORT.md)
 
 ---
 

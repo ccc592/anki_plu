@@ -1,7 +1,15 @@
 node_modules
 
+# Build outputs
+dist/
+*/dist/
+*.map
+
 # Codex session data
 .codex/
+
+# Specify templates (development tool)
+.specify/
 
 # Zone.Identifier files (Windows)
 *:Zone.Identifier
@@ -9,3 +17,24 @@ node_modules
 # Test files
 test-*.html
 debug-*.html
+
+# Logs
+*.log
+npm-debug.log*
+
+# Environment files
+.env
+.env.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# pnpm
+.pnpm-store/
