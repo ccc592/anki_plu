@@ -37,7 +37,7 @@
   "content_scripts": [
     {
       "js": [
-        "assets/index.ts-loader-gY4ZrbU3.js"
+        "assets/index.ts-loader-Cj3km8XR.js"
       ],
       "matches": [
         "<all_urls>"
@@ -57,10 +57,10 @@
         "assets/htmlCleaner-CloQSUk8.js.map",
         "assets/jsx-runtime-B0b5C804.js",
         "assets/jsx-runtime-B0b5C804.js.map",
-        "assets/AppContainer-C-uN2Pcy.js",
-        "assets/AppContainer-C-uN2Pcy.js.map",
-        "assets/index.ts-xVXGrspb.js",
-        "assets/index.ts-xVXGrspb.js.map"
+        "assets/AppContainer-DOPdxahx.js",
+        "assets/AppContainer-DOPdxahx.js.map",
+        "assets/index.ts-DpoBDGa7.js",
+        "assets/index.ts-DpoBDGa7.js.map"
       ],
       "use_dynamic_url": false
     }
