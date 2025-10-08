@@ -15,8 +15,6 @@ interface ProcessOutcome {
 const FRONT_FIELD = 'Front';
 const BACK_FIELD = 'Back';
 
-const hashTag = (hash: string) => `hash:${hash}`;
-
 export class QueueProcessor {
   private processing = false;
 
@@ -140,13 +138,8 @@ export class QueueProcessor {
         });
       }
 
-      if (respectDedupe && processedCard.hash) {
-        const duplicates = await this.anki.findNotes(`tag:"${hashTag(processedCard.hash)}"`);
-        if (duplicates.length > 0) {
-          this.emitStatus(captureId, processedCard.cardId, 'duplicate');
-          return { card: processedCard, status: 'duplicate' };
-        }
-      }
+      // Deduplication is now handled by Anki's built-in duplicate detection
+      // User no longer wants automatic hash tags
 
       const deckName = processedCard.deckId ?? 'Default';
       await this.ensureDeck(deckName);
