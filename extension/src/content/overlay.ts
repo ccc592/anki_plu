@@ -71,11 +71,25 @@ export const mountOverlay = (): void => {
     
     // Mount React app
     reactRoot = ReactDOM.createRoot(container);
-    reactRoot.render(
-      React.createElement(React.StrictMode, null,
-        React.createElement(App)
-      )
-    );
+    
+    // Import AppContainer instead of App for mode switching
+    import('@overlay/AppContainer').then(({ AppContainer }) => {
+      if (reactRoot) {
+        reactRoot.render(
+          React.createElement(React.StrictMode, null,
+            React.createElement(AppContainer)
+          )
+        );
+      }
+    }).catch((error) => {
+      console.error('[overlay] Failed to load AppContainer', error);
+      // Fallback to App
+      reactRoot?.render(
+        React.createElement(React.StrictMode, null,
+          React.createElement(App)
+        )
+      );
+    });
     
     log('Overlay mounted successfully');
   } catch (error) {

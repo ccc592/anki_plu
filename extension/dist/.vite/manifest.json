@@ -18,7 +18,7 @@
     "name": "preferences"
   },
   "index.ts-loader.js": {
-    "file": "assets/index.ts-loader-B-AEMOWe.js",
+    "file": "assets/index.ts-loader-CY69ezov.js",
     "src": "index.ts-loader.js"
   },
   "options.html": {
@@ -32,7 +32,7 @@
     ]
   },
   "src/background/index.ts": {
-    "file": "assets/index.ts-DkXdlGRY.js",
+    "file": "assets/index.ts-CV0oHyn4.js",
     "name": "index.ts",
     "src": "src/background/index.ts",
     "isEntry": true,
@@ -42,7 +42,7 @@
     ]
   },
   "src/content/index.ts": {
-    "file": "assets/index.ts-B2yKitn0.js",
+    "file": "assets/index.ts-BrmcbTQE.js",
     "name": "index.ts",
     "src": "src/content/index.ts",
     "isEntry": true,
@@ -50,6 +50,21 @@
       "_preferences-OC0DdBqU.js",
       "_htmlCleaner-CloQSUk8.js",
       "_jsx-runtime-B0b5C804.js"
+    ],
+    "dynamicImports": [
+      "src/overlay/AppContainer.tsx"
+    ]
+  },
+  "src/overlay/AppContainer.tsx": {
+    "file": "assets/AppContainer-BqUgf2bg.js",
+    "name": "AppContainer",
+    "src": "src/overlay/AppContainer.tsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "_jsx-runtime-B0b5C804.js",
+      "src/content/index.ts",
+      "_preferences-OC0DdBqU.js",
+      "_htmlCleaner-CloQSUk8.js"
     ]
   }
 }
