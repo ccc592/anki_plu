@@ -8,6 +8,8 @@ const SHADOW_HOST_ID = 'anki-assistant-shadow-host';
 let shadowRoot: ShadowRoot | null = null;
 let reactRoot: ReactDOM.Root | null = null;
 let messageListeners: ((message: unknown) => void)[] = [];
+let isReady = false;
+let pendingMessages: unknown[] = [];
 
 const log = (...args: unknown[]) => console.log('[overlay]', ...args);
 
@@ -80,6 +82,16 @@ export const mountOverlay = (): void => {
             React.createElement(AppContainer)
           )
         );
+        
+        // Mark as ready and flush pending messages after a short delay to ensure React has rendered
+        setTimeout(() => {
+          isReady = true;
+          log('Overlay ready, flushing', pendingMessages.length, 'pending messages');
+          pendingMessages.forEach((msg) => {
+            sendMessageToOverlay(msg);
+          });
+          pendingMessages = [];
+        }, 50);
       }
     }).catch((error) => {
       console.error('[overlay] Failed to load AppContainer', error);
@@ -89,6 +101,11 @@ export const mountOverlay = (): void => {
           React.createElement(App)
         )
       );
+      setTimeout(() => {
+        isReady = true;
+        pendingMessages.forEach((msg) => sendMessageToOverlay(msg));
+        pendingMessages = [];
+      }, 50);
     });
     
     log('Overlay mounted successfully');
@@ -114,6 +131,8 @@ export const unmountOverlay = (): void => {
   
   shadowRoot = null;
   messageListeners = [];
+  isReady = false;
+  pendingMessages = [];
   
   log('Overlay unmounted');
 };
@@ -147,6 +166,13 @@ export const showOverlay = (): void => {
 export const sendMessageToOverlay = (message: unknown): void => {
   if (!shadowRoot) {
     log('Cannot send message - overlay not mounted');
+    return;
+  }
+  
+  // If overlay is not ready yet, queue the message
+  if (!isReady) {
+    log('Overlay not ready yet, queuing message');
+    pendingMessages.push(message);
     return;
   }
   
