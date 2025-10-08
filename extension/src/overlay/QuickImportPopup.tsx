@@ -1,12 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useCardStore } from './state/useCardStore';
-import { usePreferences } from './state/usePreferences';
 import { submitSelectedCards } from './actions/submitCards';
 import { useDraggable } from './hooks/useDraggable';
 import { showToast } from './utils/toastManager';
 import { 
-  getRecentDecks, 
-  getRecentModels, 
   getLastDeck, 
   getLastModel,
   saveRecentDeck,
@@ -114,22 +111,29 @@ export const QuickImportPopup: React.FC<QuickImportPopupProps> = ({
   const decks = configSnapshot?.availableDecks ?? [];
   const models = configSnapshot?.availableModels ?? ['Basic'];
 
-  const [deck, setDeck] = useState(getLastDeck() ?? configSnapshot?.defaultDeck ?? '');
-  const [model, setModel] = useState(getLastModel() ?? configSnapshot?.defaultModel ?? 'Basic');
+  const [deck, setDeck] = useState('');
+  const [model, setModel] = useState('');
   const [tags, setTags] = useState('');
   const [statusMessage, setStatusMessage] = useState('');
   const [isImporting, setIsImporting] = useState(false);
 
-  // Draggable functionality
   const draggable = useDraggable({
     initialPosition: { 
-      x: window.innerWidth - 370, // 350px width + 20px margin
-      y: window.innerHeight - 520  // 500px max height + 20px margin
+      x: window.innerWidth - 370,
+      y: window.innerHeight - 520
     },
     storageKey: 'quick-import'
   });
 
-  // Apply to cards when changed
+  useEffect(() => {
+    if (configSnapshot && !deck && !model) {
+      const initialDeck = getLastDeck() ?? configSnapshot.defaultDeck ?? '';
+      const initialModel = getLastModel() ?? configSnapshot.defaultModel ?? 'Basic';
+      setDeck(initialDeck);
+      setModel(initialModel);
+    }
+  }, [configSnapshot, deck, model]);
+
   useEffect(() => {
     if (deck) {
       applyDeck(deck);

@@ -50,22 +50,13 @@ export const AppContainer: React.FC = () => {
       if (type === 'capture:ready') {
         const payload = (message as { payload: CaptureResponse }).payload;
         const configSnapshot: UserPreferencesSnapshot | undefined = payload.configSnapshot;
-
-        console.log('[AppContainer] Received capture:ready');
-        console.log('[AppContainer] configSnapshot:', configSnapshot);
-        console.log('[AppContainer] availableDecks:', configSnapshot?.availableDecks);
-        console.log('[AppContainer] availableModels:', configSnapshot?.availableModels);
-
         const normalized = normalizeCards(payload.cards ?? []);
         
-        // IMPORTANT: Pass configSnapshot to CardStore
         setCards(normalized, {
           config: configSnapshot,
           sourceHtml: payload.sourceHtml,
           captureId: payload.captureId
         });
-
-        console.log('[AppContainer] Cards set with config');
       }
     };
 

@@ -18,7 +18,7 @@
     "name": "preferences"
   },
   "index.ts-loader.js": {
-    "file": "assets/index.ts-loader-Cj3km8XR.js",
+    "file": "assets/index.ts-loader-Z6TVDg_x.js",
     "src": "index.ts-loader.js"
   },
   "options.html": {
@@ -42,7 +42,7 @@
     ]
   },
   "src/content/index.ts": {
-    "file": "assets/index.ts-DpoBDGa7.js",
+    "file": "assets/index.ts-Ch3WFsgd.js",
     "name": "index.ts",
     "src": "src/content/index.ts",
     "isEntry": true,
@@ -56,7 +56,7 @@
     ]
   },
   "src/overlay/AppContainer.tsx": {
-    "file": "assets/AppContainer-DOPdxahx.js",
+    "file": "assets/AppContainer-Dbo6CwTO.js",
     "name": "AppContainer",
     "src": "src/overlay/AppContainer.tsx",
     "isDynamicEntry": true,
