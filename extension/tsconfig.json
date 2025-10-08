@@ -1,0 +1,21 @@
+{
+  "extends": "../tsconfig.base.json",
+  "compilerOptions": {
+    "composite": true,
+    "jsx": "react-jsx",
+    "baseUrl": ".",
+    "paths": {
+      "@background/*": ["src/background/*"],
+      "@content/*": ["src/content/*"],
+      "@overlay/*": ["src/overlay/*"],
+      "@options/*": ["src/options/*"],
+      "@messaging/*": ["src/messaging/*"],
+      "@shared/*": ["src/shared/*"],
+      "@tests/*": ["../extension-tests/*"]
+    },
+    "outDir": "./dist",
+    "types": ["chrome", "vite/client"]
+  },
+  "include": ["src"],
+  "references": []
+}

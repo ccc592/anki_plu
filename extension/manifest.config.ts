@@ -1,0 +1,44 @@
+import { defineManifest } from '@crxjs/vite-plugin';
+
+export default defineManifest(({ mode }) => ({
+  manifest_version: 3,
+  name: mode === 'development' ? 'Anki Assistant (Dev)' : 'Anki Assistant',
+  version: '0.1.0',
+  description: 'Capture web content and send curated cards to Anki.',
+  action: {
+    default_title: 'Anki Assistant'
+  },
+  background: {
+    service_worker: 'src/background/index.ts',
+    type: 'module'
+  },
+  permissions: [
+    'storage',
+    'scripting',
+    'contextMenus',
+    'activeTab',
+    'commands'
+  ],
+  host_permissions: ['<all_urls>'],
+  commands: {
+    'trigger-capture': {
+      suggested_key: {
+        default: 'Alt+A'
+      },
+      description: 'Capture selected content for Anki'
+    }
+  },
+  icons: {
+    '16': 'icons/icon-16.png',
+    '48': 'icons/icon-48.png',
+    '128': 'icons/icon-128.png'
+  },
+  options_page: 'options.html',
+  content_scripts: [
+    {
+      matches: ['<all_urls>'],
+      js: ['src/content/index.ts'],
+      run_at: 'document_idle'
+    }
+  ]
+}));

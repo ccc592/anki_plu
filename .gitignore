@@ -1,0 +1,11 @@
+node_modules
+
+# Codex session data
+.codex/
+
+# Zone.Identifier files (Windows)
+*:Zone.Identifier
+
+# Test files
+test-*.html
+debug-*.html

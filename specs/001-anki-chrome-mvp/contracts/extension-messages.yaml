@@ -1,0 +1,383 @@
+openapi: 3.0.3
+info:
+  title: Anki Assistant Extension Messaging API
+  version: 0.1.0
+  description: |
+    Reference contract for message schemas exchanged between content scripts,
+    overlay UI, and the background service worker. Implemented via
+    `chrome.runtime.sendMessage` but represented here as RESTful endpoints for
+    testing harnesses.
+servers:
+  - url: https://extension.local.test
+paths:
+  /captures:
+    post:
+      summary: Start a capture session from a DOM selection or clipboard HTML.
+      operationId: startCapture
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CaptureRequest'
+      responses:
+        '201':
+          description: Capture created with detected candidate cards.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CaptureResponse'
+  /captures/{captureId}/cards/{cardId}:
+    patch:
+      summary: Update a candidate card prior to submission.
+      operationId: updateCandidateCard
+      parameters:
+        - $ref: '#/components/parameters/CaptureId'
+        - $ref: '#/components/parameters/CardId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CardUpdate'
+      responses:
+        '200':
+          description: Card updated with new content or selection state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CandidateCard'
+  /captures/{captureId}/submit:
+    post:
+      summary: Queue selected candidate cards for Anki import.
+      operationId: submitCapture
+      parameters:
+        - $ref: '#/components/parameters/CaptureId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubmissionRequest'
+      responses:
+        '202':
+          description: Submission accepted and queued.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubmissionResponse'
+  /captures/{captureId}/cards/{cardId}/retry:
+    post:
+      summary: Retry a failed card (image or Anki error) using latest preferences.
+      operationId: retryCard
+      parameters:
+        - $ref: '#/components/parameters/CaptureId'
+        - $ref: '#/components/parameters/CardId'
+      responses:
+        '202':
+          description: Retry accepted.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubmissionResponse'
+  /preferences:
+    get:
+      summary: Retrieve current user preferences snapshot.
+      operationId: getPreferences
+      responses:
+        '200':
+          description: Current preferences.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserPreferences'
+    put:
+      summary: Persist updated preferences and broadcast to active contexts.
+      operationId: updatePreferences
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserPreferences'
+      responses:
+        '204':
+          description: Preferences updated.
+  /sync-status:
+    get:
+      summary: Inspect current AnkiConnect health status.
+      operationId: getSyncStatus
+      responses:
+        '200':
+          description: Current sync status record.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SyncStatus'
+components:
+  parameters:
+    CaptureId:
+      name: captureId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    CardId:
+      name: cardId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+  schemas:
+    CaptureRequest:
+      type: object
+      required: [sourceUrl, htmlFragment, heuristics]
+      properties:
+        sourceUrl:
+          type: string
+          format: uri
+        pageTitle:
+          type: string
+          maxLength: 256
+        htmlFragment:
+          type: string
+          description: Sanitized HTML snippet extracted from selection or clipboard.
+        heuristics:
+          $ref: '#/components/schemas/HeuristicToggles'
+        configSnapshot:
+          $ref: '#/components/schemas/UserPreferences'
+    CaptureResponse:
+      type: object
+      required: [captureId, cards, media]
+      properties:
+        captureId:
+          type: string
+          format: uuid
+        cards:
+          type: array
+          items:
+            $ref: '#/components/schemas/CandidateCard'
+        media:
+          type: array
+          items:
+            $ref: '#/components/schemas/MediaAsset'
+    CandidateCard:
+      type: object
+      required: [cardId, frontHtml, backHtml, confidence, status, selected, hash]
+      properties:
+        cardId:
+          type: string
+          format: uuid
+        frontHtml:
+          type: string
+        backHtml:
+          type: string
+        confidence:
+          type: number
+          minimum: 0
+          maximum: 1
+        status:
+          type: string
+          enum: [draft, queued, added, duplicate, failed:image, failed:anki, skipped:user]
+        selected:
+          type: boolean
+        deckId:
+          type: string
+        modelId:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+        hash:
+          type: string
+          pattern: '^[a-f0-9]{12}$'
+        errorDetails:
+          type: string
+          nullable: true
+    MediaAsset:
+      type: object
+      required: [mediaId, sourceUrl, state]
+      properties:
+        mediaId:
+          type: string
+        sourceUrl:
+          type: string
+        filename:
+          type: string
+        state:
+          type: string
+          enum: [pending, downloading, stored, failed]
+        failureReason:
+          type: string
+          nullable: true
+        retries:
+          type: integer
+          minimum: 0
+        contentType:
+          type: string
+        sizeBytes:
+          type: integer
+          minimum: 0
+    CardUpdate:
+      type: object
+      properties:
+        frontHtml:
+          type: string
+        backHtml:
+          type: string
+        selected:
+          type: boolean
+        deckId:
+          type: string
+        modelId:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+      additionalProperties: false
+    SubmissionRequest:
+      type: object
+      required: [selectedCardIds]
+      properties:
+        selectedCardIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+        dedupeStrategy:
+          type: string
+          enum: [respect, bypass]
+          default: respect
+    SubmissionResponse:
+      type: object
+      required: [captureId, queuedCardIds]
+      properties:
+        captureId:
+          type: string
+          format: uuid
+        queuedCardIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+        summary:
+          type: object
+          properties:
+            queued:
+              type: integer
+            duplicates:
+              type: integer
+            failures:
+              type: integer
+    UserPreferences:
+      type: object
+      properties:
+        defaultDeck:
+          type: string
+          nullable: true
+        defaultModel:
+          type: string
+          default: Basic
+        tagTemplate:
+          type: string
+        heuristics:
+          $ref: '#/components/schemas/HeuristicToggles'
+        htmlAllowlist:
+          type: object
+          properties:
+            tags:
+              type: array
+              items:
+                type: string
+            styles:
+              type: array
+              items:
+                type: string
+        mediaPolicy:
+          $ref: '#/components/schemas/MediaPolicy'
+        shortcut:
+          type: string
+        clipboardEnabled:
+          type: boolean
+        siteAllowlist:
+          type: array
+          items:
+            type: string
+        siteBlocklist:
+          type: array
+          items:
+            type: string
+      additionalProperties: false
+    HeuristicToggles:
+      type: object
+      properties:
+        explicitMarkers:
+          type: boolean
+        structureHints:
+          type: boolean
+        questionMarks:
+          type: boolean
+        listTable:
+          type: boolean
+      additionalProperties: false
+    MediaPolicy:
+      type: object
+      properties:
+        downloadExternal:
+          type: boolean
+        convertWebP:
+          type: boolean
+        concurrency:
+          type: integer
+          minimum: 1
+          maximum: 6
+        retryLimit:
+          type: integer
+          minimum: 0
+          maximum: 5
+        maxSizeMB:
+          type: number
+          minimum: 0
+      additionalProperties: false
+    SyncStatus:
+      type: object
+      required: [availability, lastChecked]
+      properties:
+        availability:
+          type: string
+          enum: [reachable, unreachable, unauthorized, timeout]
+        version:
+          type: string
+          nullable: true
+        lastChecked:
+          type: string
+          format: date-time
+        whitelistMissing:
+          type: boolean
+        retrySchedule:
+          type: object
+          properties:
+            nextRetryAt:
+              type: string
+              format: date-time
+            exponent:
+              type: integer
+              minimum: 0
+        recentErrors:
+          type: array
+          items:
+            type: object
+            properties:
+              timestamp:
+                type: string
+                format: date-time
+              message:
+                type: string
+              context:
+                type: string
+            required: [timestamp, message]
+      additionalProperties: false

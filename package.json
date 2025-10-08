@@ -1,0 +1,17 @@
+{
+  "name": "anki-plu-workspace",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Monorepo workspace for the Anki Assistant Chrome Extension MVP",
+  "license": "MIT",
+  "packageManager": "pnpm@9.0.0",
+  "scripts": {
+    "lint": "pnpm -r lint",
+    "build": "pnpm -r build",
+    "test": "pnpm -r test",
+    "format": "pnpm -r format"
+  },
+  "devDependencies": {
+    "prettier": "^3.3.2"
+  }
+}
