@@ -207,8 +207,8 @@ export const QuickImportPopup: React.FC<QuickImportPopupProps> = ({
 
   const draggable = useDraggable({
     initialPosition: { 
-      x: window.innerWidth - 370,
-      y: window.innerHeight - 520
+      x: Math.max(20, window.innerWidth - 370),
+      y: Math.max(20, window.innerHeight - 520)
     },
     storageKey: 'quick-import'
   });
