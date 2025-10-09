@@ -1,15 +1,18 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import type { UserPreferences } from '@messaging/schemas';
 import { SiteRules } from './SiteRules';
 
 interface Props {
-  preferences: UserPreferences;
+  draft: UserPreferences;
   saving: boolean;
+  hasChanges: boolean;
+  onChange: React.Dispatch<React.SetStateAction<UserPreferences>>;
   onSave: (preferences: UserPreferences) => void;
+  onReset: () => void;
 }
 
-export const PreferencesForm: React.FC<Props> = ({ preferences, onSave, saving }) => {
-  const [draft, setDraft] = useState<UserPreferences>({ ...preferences });
+export const PreferencesForm: React.FC<Props> = ({ draft, onChange, onSave, saving, hasChanges, onReset }) => {
+  const setDraft = onChange;
 
   const tagPreview = useMemo(() => {
     const now = new Date();
@@ -46,9 +49,12 @@ export const PreferencesForm: React.FC<Props> = ({ preferences, onSave, saving }
   };
 
   return (
-    <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+    <form onSubmit={handleSubmit} style={formStyle}>
       <section style={sectionStyle}>
-        <h2 style={sectionTitle}>General</h2>
+        <header style={sectionHeader}>
+          <h2 style={sectionTitle}>General</h2>
+          <p style={sectionDescription}>Where newly captured cards should live and how they are tagged.</p>
+        </header>
         <div style={fieldGrid}>
           <label style={labelStyle}>
             <span>Default Deck</span>
@@ -80,7 +86,10 @@ export const PreferencesForm: React.FC<Props> = ({ preferences, onSave, saving }
       </section>
 
       <section style={sectionStyle}>
-        <h2 style={sectionTitle}>Detection Heuristics</h2>
+        <header style={sectionHeader}>
+          <h2 style={sectionTitle}>Detection Heuristics</h2>
+          <p style={sectionDescription}>Toggle the strategies used to infer question and answer boundaries.</p>
+        </header>
         <div style={toggleGrid}>
           {(
             [
@@ -103,7 +112,10 @@ export const PreferencesForm: React.FC<Props> = ({ preferences, onSave, saving }
       </section>
 
       <section style={sectionStyle}>
-        <h2 style={sectionTitle}>Media Policy</h2>
+        <header style={sectionHeader}>
+          <h2 style={sectionTitle}>Media Policy</h2>
+          <p style={sectionDescription}>Control how linked assets are downloaded and transformed.</p>
+        </header>
         <div style={fieldGrid}>
           <label style={labelStyle}>
             <span>Download External</span>
@@ -157,7 +169,12 @@ export const PreferencesForm: React.FC<Props> = ({ preferences, onSave, saving }
       </section>
 
       <section style={sectionStyle}>
-        <h2 style={sectionTitle}>Site Rules</h2>
+        <header style={sectionHeader}>
+          <h2 style={sectionTitle}>Site Rules</h2>
+          <p style={sectionDescription}>
+            Maintain allow and block lists to override heuristics on specific domains.
+          </p>
+        </header>
         <SiteRules
           allowlist={draft.siteAllowlist}
           blocklist={draft.siteBlocklist}
@@ -168,7 +185,10 @@ export const PreferencesForm: React.FC<Props> = ({ preferences, onSave, saving }
       </section>
 
       <section style={sectionStyle}>
-        <h2 style={sectionTitle}>Accessibility</h2>
+        <header style={sectionHeader}>
+          <h2 style={sectionTitle}>Accessibility</h2>
+          <p style={sectionDescription}>Shortcuts and fallbacks that help you capture content quickly.</p>
+        </header>
         <label style={toggleStyle}>
           <input
             type="checkbox"
@@ -187,13 +207,22 @@ export const PreferencesForm: React.FC<Props> = ({ preferences, onSave, saving }
         </label>
       </section>
 
-      <footer style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem' }}>
-        <button type="submit" disabled={saving} style={submitStyle}>
+      <footer style={footerStyle}>
+        <button type="button" disabled={!hasChanges || saving} style={secondaryButtonStyle} onClick={onReset}>
+          Reset changes
+        </button>
+        <button type="submit" disabled={saving || !hasChanges} style={submitStyle}>
           {saving ? 'Saving…' : 'Save Preferences'}
         </button>
       </footer>
     </form>
   );
+};
+
+const formStyle: React.CSSProperties = {
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '1.5rem'
 };
 
 const sectionStyle: React.CSSProperties = {
@@ -204,10 +233,21 @@ const sectionStyle: React.CSSProperties = {
   border: '1px solid #e2e8f0'
 };
 
+const sectionHeader: React.CSSProperties = {
+  marginBottom: '1.1rem'
+};
+
 const sectionTitle: React.CSSProperties = {
   marginTop: 0,
   marginBottom: '1rem',
   fontSize: '1.15rem'
+};
+
+const sectionDescription: React.CSSProperties = {
+  margin: 0,
+  color: '#64748b',
+  fontSize: '0.85rem',
+  lineHeight: 1.5
 };
 
 const fieldGrid: React.CSSProperties = {
@@ -259,4 +299,20 @@ const submitStyle: React.CSSProperties = {
   border: 'none',
   cursor: 'pointer',
   fontSize: '0.95rem'
+};
+
+const secondaryButtonStyle: React.CSSProperties = {
+  padding: '0.6rem 1.1rem',
+  borderRadius: '0.65rem',
+  background: '#e2e8f0',
+  color: '#1e293b',
+  border: 'none',
+  cursor: 'pointer',
+  fontSize: '0.9rem'
+};
+
+const footerStyle: React.CSSProperties = {
+  display: 'flex',
+  justifyContent: 'flex-end',
+  gap: '0.75rem'
 };
