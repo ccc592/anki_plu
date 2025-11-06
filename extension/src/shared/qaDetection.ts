@@ -19,6 +19,9 @@ type Block = {
 
 const EXPLICIT_QUESTION = /^(?:q\s*:|question\s*:|问\s*[：: ]|问题\s*[：:])/i;
 const EXPLICIT_ANSWER = /^(?:a\s*:|answer\s*:|答\s*[：: ]|答案\s*[：:])/i;
+// Cleanup patterns without ^ anchor - for removing markers anywhere in text
+const QUESTION_MARKER_CLEANUP = /(?:q\s*:|question\s*:|问\s*[：: ]|问题\s*[：:])/gi;
+const ANSWER_MARKER_CLEANUP = /(?:a\s*:|answer\s*:|答\s*[：: ]|答案\s*[：:])/gi;
 const QUESTION_MARK = /[?？]\s*$/;
 const HEADING_TAGS = new Set(['H1', 'H2', 'H3', 'H4']);
 const CONFIDENCE = {
@@ -135,6 +138,49 @@ const asHtml = (element: Element) => {
   return element.innerHTML || element.outerHTML;
 };
 
+/**
+ * Remove Q/A markers from HTML at the DOM level
+ * This handles cases where markers are interrupted by HTML tags
+ * e.g., "问<strong>：</strong>" or multiple markers in nested elements
+ */
+const removeMarkerFromHtml = (html: string, markerPattern: RegExp): string => {
+  if (!html.trim()) {
+    return html;
+  }
+
+  // Parse HTML into DOM
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(`<div>${html}</div>`, 'text/html');
+  const container = doc.body.firstElementChild;
+
+  if (!container) {
+    // Fallback: use simple string replace
+    return html.replace(markerPattern, '').trim();
+  }
+
+  // Walk through all text nodes and remove markers
+  const walkTextNodes = (node: Node): void => {
+    if (node.nodeType === Node.TEXT_NODE) {
+      // Clean markers from text content
+      const originalText = node.textContent || '';
+      const cleanedText = originalText.replace(markerPattern, '');
+
+      if (cleanedText !== originalText) {
+        node.textContent = cleanedText;
+      }
+    } else if (node.nodeType === Node.ELEMENT_NODE) {
+      // Recursively process child nodes
+      Array.from(node.childNodes).forEach(walkTextNodes);
+    }
+  };
+
+  walkTextNodes(container);
+
+  // Return cleaned HTML
+  const result = container.innerHTML;
+  return result.trim();
+};
+
 const dedupeBySerialized = (pairs: DetectedPair[]) => {
   // Dedupe by text content (not HTML) and keep highest confidence
   const seenByText = new Map<string, DetectedPair>();
@@ -223,17 +269,17 @@ const runExplicitMarkers = (blocks: Block[]): DetectedPair[] => {
     let questionHtml = questionBlocks
       .map(block => asHtml(block.element))
       .join('');
-    
-    // Remove "问：" prefix only from first block
-    questionHtml = questionHtml.replace(EXPLICIT_QUESTION, '').trim();
-    
+
+    // Remove all Q markers using DOM-based cleaning
+    questionHtml = removeMarkerFromHtml(questionHtml, QUESTION_MARKER_CLEANUP);
+
     // Build answer HTML by joining all answer blocks
     let answerHtml = answerBlocks
       .map(block => asHtml(block.element))
       .join('');
-    
-    // Remove "答：" prefix only from first block
-    answerHtml = answerHtml.replace(EXPLICIT_ANSWER, '').trim();
+
+    // Remove all A markers using DOM-based cleaning
+    answerHtml = removeMarkerFromHtml(answerHtml, ANSWER_MARKER_CLEANUP);
     
     if (questionHtml && answerHtml) {
       pairs.push({
@@ -369,14 +415,10 @@ const detectExplicitPairsSimple = (html: string): DetectedPair[] => {
     
     let frontHtml = html.substring(frontStart, frontEnd);
     let backHtml = html.substring(backStart, backEnd);
-    
-    // Remove ONLY the first Q/A marker (not all occurrences)
-    // Use a non-global pattern to replace only once
-    const qPatternSingle = /(问\s*[：:]|Q\s*:|question\s*:|问题\s*[：:])/i;
-    const aPatternSingle = /(答\s*[：:]|A\s*:|answer\s*:|答案\s*[：:])/i;
-    
-    frontHtml = frontHtml.replace(qPatternSingle, '').trim();
-    backHtml = backHtml.replace(aPatternSingle, '').trim();
+
+    // Remove Q/A markers using DOM-based cleaning (handles HTML tags interrupting markers)
+    frontHtml = removeMarkerFromHtml(frontHtml, QUESTION_MARKER_CLEANUP);
+    backHtml = removeMarkerFromHtml(backHtml, ANSWER_MARKER_CLEANUP);
     
     console.log(`[qaDetection] Pair ${i + 1}:`);
     console.log('  Front HTML preview:', frontHtml.substring(0, 80));
